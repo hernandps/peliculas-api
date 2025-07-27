@@ -15,7 +15,7 @@ class _AgregarPeliculaScreenState extends State<AgregarPeliculaScreen> {
   DateTime? _fechaSeleccionada;
 
   Future<void> _guardarPelicula() async {
-    final url = Uri.parse('http://localhost:8000/peliculas');
+    final url = Uri.parse('https://peliculas-api-6ak4.onrender.com/peliculas/');
 
     final response = await http.post(
       url,
@@ -29,7 +29,7 @@ class _AgregarPeliculaScreenState extends State<AgregarPeliculaScreen> {
     );
 
     if (response.statusCode == 200) {
-      Navigator.pop(context); // Vuelve a la pantalla anterior
+      Navigator.pop(context, true); // Vuelve a la pantalla anterior
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al guardar la película')),

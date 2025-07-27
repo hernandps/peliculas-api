@@ -7,7 +7,7 @@ void main() {
   runApp(MyApp());
 }
 
-const String apiUrl = "http://localhost:8000/peliculas"; // para emulador Android
+const String apiUrl = "https://peliculas-api-6ak4.onrender.com/peliculas"; // para emulador Android
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,16 +27,23 @@ class PeliculasScreen extends StatefulWidget {
 class _PeliculasScreenState extends State<PeliculasScreen> {
   List peliculas = [];
 
-  Future<void> fetchPeliculas() async {
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      setState(() {
-        peliculas = json.decode(response.body);
-      });
-    } else {
-      throw Exception('Error al cargar películas');
+    Future<void> fetchPeliculas() async {
+      try {
+        final response = await http.get(Uri.parse(apiUrl));
+        print('Código: ${response.statusCode}');
+        print('Respuesta: ${response.body}');
+
+        if (response.statusCode == 200) {
+          setState(() {
+            peliculas = json.decode(response.body);
+          });
+        } else {
+          throw Exception('Error HTTP: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error al conectar con la API: $e');
+      }
     }
-  }
 
   @override
   void initState() {
@@ -48,11 +55,15 @@ class _PeliculasScreenState extends State<PeliculasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AgregarPeliculaScreen()),
-    );
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AgregarPeliculaScreen()),
+          ).then((resultado) {
+            if (resultado == true) {
+              fetchPeliculas(); // Refresca al volver si se agregó algo
+            }
+          });
   },
   child: Icon(Icons.add),
 ),
